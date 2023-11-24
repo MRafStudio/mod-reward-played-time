@@ -24,7 +24,19 @@ public:
     void OnLogin(Player* player)  override
     {
         if (sConfigMgr->GetOption<bool>("RewardSystemEnable", true) && sConfigMgr->GetOption<bool>("RewardSystem.Announce", true)) {
-            ChatHandler(player->GetSession()).SendSysMessage("This server is running the |cff4CFF00Reward Time Played |rmodule.");
+            // Locales ruRU / enGB
+            WorldSession* session = player->GetSession();
+            switch (session->GetSessionDbLocaleIndex())
+            {
+            case LOCALE_ruRU:
+            {
+                ChatHandler(player->GetSession()).SendSysMessage("На сервере запущен модуль |cff4CFF00Reward Time Played |r");
+                break;
+            }
+            default:
+                ChatHandler(player->GetSession()).SendSysMessage("This server is running the |cff4CFF00Reward Time Played |rmodule.");
+                break;
+            }
         }
     }
 
@@ -34,6 +46,9 @@ public:
         {
             if (RewardTimer > 0)
             {
+                // Locales ruRU / enGB
+                WorldSession* session = player->GetSession();
+
                 if (player->isAFK())
                     return;
 
@@ -45,7 +60,17 @@ public:
 
                     if (!result)
                     {
-                        ChatHandler(player->GetSession()).PSendSysMessage("[Reward System] Better luck next time! Your roll was %u.", roll);
+                        switch (session->GetSessionDbLocaleIndex())
+                        {
+                        case LOCALE_ruRU:
+                        {
+                            ChatHandler(player->GetSession()).PSendSysMessage("[Система вознаграждений] Повезет в следующий раз! Ваш бросок был %u.", roll);
+                            break;
+                        }
+                        default:
+                            ChatHandler(player->GetSession()).PSendSysMessage("[Reward System] Better luck next time! Your roll was %u.", roll);
+                            break;
+                        }
                         RewardTimer = initialTimer;
                         return;
                     }
@@ -62,7 +87,17 @@ public:
                         SendRewardToPlayer(player, pItem, quantity);
                     } while (result->NextRow());
 
-                    ChatHandler(player->GetSession()).PSendSysMessage("[Reward System] Congratulations you have won with a roll of %u.", roll);
+                    switch (session->GetSessionDbLocaleIndex())
+                    {
+                    case LOCALE_ruRU:
+                    {
+                        ChatHandler(player->GetSession()).PSendSysMessage("[Система вознаграждений] Поздравляем, вы выиграли выбросив %u.", roll);
+                        break;
+                    }
+                    default:
+                        ChatHandler(player->GetSession()).PSendSysMessage("[Reward System] Congratulations you have won with a roll of %u.", roll);
+                        break;
+                    }
 
                     RewardTimer = initialTimer;
                 }
@@ -76,13 +111,29 @@ public:
         if (receiver->IsInWorld() && receiver->AddItem(itemId, count))
             return;
 
-        ChatHandler(receiver->GetSession()).PSendSysMessage("You will receive your item in your mailbox");
+        // Locales ruRU / enGB
+        WorldSession* session = receiver->GetSession();
+        std::string subject = "";
+        std::string text = "";
+        switch (session->GetSessionDbLocaleIndex())
+        {
+        case LOCALE_ruRU:
+        {
+            std::string subject = "Приз системы вознаграждений";
+            std::string text = "Поздравляем, вы выиграли приз!";
+            ChatHandler(receiver->GetSession()).PSendSysMessage("Свой подарок Вы получите в почтовый ящик");
+            break;
+        }
+        default:
+            std::string subject = "Reward System prize";
+            std::string text = "Congratulations, you won a prize!";
+            ChatHandler(receiver->GetSession()).PSendSysMessage("You will receive your item in your mailbox");
+            break;
+        }
+
         // format: name "subject text" "mail text" item1[:count1] item2[:count2] ... item12[:count12]
         uint64 receiverGuid = receiver->GetGUID().GetCounter();
         std::string receiverName;
-
-        std::string subject = "Reward System prize";
-        std::string text = "Congratulations, you won a prize!";
 
         ItemTemplate const* item_proto = sObjectMgr->GetItemTemplate(itemId);
 
