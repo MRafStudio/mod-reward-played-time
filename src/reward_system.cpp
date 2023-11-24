@@ -64,7 +64,7 @@ public:
                         {
                         case LOCALE_ruRU:
                         {
-                            ChatHandler(player->GetSession()).PSendSysMessage("[Система вознаграждений] Повезет в следующий раз! Ваш бросок был %u.", roll);
+                            ChatHandler(player->GetSession()).PSendSysMessage("[Система вознаграждений] В следующий раз повезёт! А пока выпало число: %u.", roll);
                             break;
                         }
                         default:
@@ -91,7 +91,7 @@ public:
                     {
                     case LOCALE_ruRU:
                     {
-                        ChatHandler(player->GetSession()).PSendSysMessage("[Система вознаграждений] Поздравляем, вы выиграли выбросив %u.", roll);
+                        ChatHandler(player->GetSession()).PSendSysMessage("[Система вознаграждений] Поздравляем, выпало счастливое число: %u.", roll);
                         break;
                     }
                     default:
